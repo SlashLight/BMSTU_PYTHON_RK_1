@@ -200,7 +200,7 @@ SALARY ANALYSIS
 ======================================================================
 
 Salary Distribution Statistics:
-  count                       755 RUB
+  count                       755
   mean                    156,773 RUB
   std                      55,486 RUB
   min                      46,644 RUB
