@@ -33,15 +33,40 @@ class BudgetAnalyzer(BaseAnalyzer):
         self.logger.info(LogMessages.ANALYSIS_START.format("budget"))
 
         try:
+            # Print section header
+            print("=" * 70)
+            print("BUDGET ANALYSIS")
+            print("=" * 70)
+            
             # Total budget analysis
             total_budget, budget_per_department = self._analyse_budget()
-
+            print(f"\nTotal Budget: {total_budget:,.0f} RUB")
+            print(f"\nBudget Distribution by Department (Top 10):")
+            top_departments = budget_per_department.nlargest(10, 'budget')
+            for idx, row in top_departments.iterrows():
+                print(f"  {row['name']:40s} {row['budget']:>12,.0f} RUB")
+            print(
+                f"\nWhich is {top_departments['budget'].sum() * 100 / total_budget:,.2f}% of total budget")
             # Department with highest budget
             highest_budget_department, lowest_budget_department = self._analyse_department_budget()
+            print(f"\nDepartment Budget Efficiency:")
+            print(f"  Highest Budget/Employee: {highest_budget_department['name']}")
+            print(f"    Budget per Employee: {highest_budget_department['budget_per_employee']:,.0f} RUB")
+            print(f"  Lowest Budget/Employee: {lowest_budget_department['name']}")
+            print(f"    Budget per Employee: {lowest_budget_department['budget_per_employee']:,.0f} RUB")
 
             # Analyze budget utilization rate for departments
             budget_utilization = self._analyse_budget_utilization()
-
+            util_df = pd.DataFrame(budget_utilization)
+            print(f"\nAverage budget utilization rate across departments: {util_df['financial_metrics.budget_utilization'].mean():,.2f}%")
+            print(f"\nBudget Utilization by Department (Top 10):")
+            top_util = util_df.nlargest(10, 'financial_metrics.budget_utilization')
+            low_util = util_df.nsmallest(3, 'financial_metrics.budget_utilization')
+            for idx, row in top_util.iterrows():
+                print(f"  {row['name']:40s} {row['financial_metrics.budget_utilization']:>6.1f}%")
+            print("\nLowest Budget Utilization Departments:")
+            for idx, row in low_util.iterrows():
+                print(f"  {row['name']:40s} {row['financial_metrics.budget_utilization']:>6.1f}%")
             # Compile results
             analysis_results = {
                 "total_budget": total_budget,

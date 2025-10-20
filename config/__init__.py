@@ -3,14 +3,12 @@
 Contains enums and message templates for system configuration
 """
 
-from .enums import EquipmentStatus, DepartmentType, EquipmentType, AnalysisPriority, UtilizationLevel
+from .enums import AnalysisType, DepartmentCategory, UtilizationLevel
 from .messages import LogMessages, ReportMessages, ErrorMessages
 
 __all__ = [
-    'EquipmentStatus',
-    'DepartmentType',
-    'EquipmentType',
-    'AnalysisPriority',
+    'AnalysisType',
+    'DepartmentCategory',
     'UtilizationLevel',
     'LogMessages',
     'ReportMessages',

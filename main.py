@@ -1,16 +1,25 @@
 """
-@brief Main execution script for IT Infrastructure Analysis System
+@brief Main execution script for Financial Analysis System
 Orchestrates all analysis modules and generates comprehensive reports
 """
 
 import os
 import sys
+import warnings
+import pandas as pd
+
+# Suppress pandas warnings for cleaner output
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=pd.errors.SettingWithCopyWarning)
+
 from analyzers.budget_analyzer import BudgetAnalyzer
 from analyzers.salary_analyzer import SalaryAnalyzer
 from analyzers.roi_analyzer import RoiAnalyzer
 from analyzers.cost_optimization_analyzer import CostOptimizationAnalyzer
 from analyzers.financial_planning_analyzer import CompanyOverviewAnalyzer
 from config.messages import LogMessages, ReportMessages
+
+import pandas as pd
 
 class FinancialAnalysisOrchestrator:
     """
@@ -36,7 +45,6 @@ class FinancialAnalysisOrchestrator:
         self.salary_analysis_module = SalaryAnalyzer(json_data_file_path)
         self.roi_analysis_module = RoiAnalyzer(json_data_file_path)
         self.cost_analysis_module = CostOptimizationAnalyzer(json_data_file_path)
-        self.company_overview_module = CompanyOverviewAnalyzer(json_data_file_path, self.roi_analysis_module.execute_analysis())
 
     def _verify_data_file_exists(self):
         """
@@ -73,6 +81,8 @@ class FinancialAnalysisOrchestrator:
             print("\nEXECUTING ROI ANALYSIS...")
             roi_analysis_results = self.roi_analysis_module.execute_analysis()
             self.analysis_results_collection['roi'] = roi_analysis_results
+            self.company_overview_module = CompanyOverviewAnalyzer(self.json_data_file_path,
+                                                                  roi_analysis_results)
 
             print("\nEXECUTING COST ANALYSIS...")
             cost_analysis_results = self.cost_analysis_module.execute_analysis()
@@ -101,33 +111,53 @@ class FinancialAnalysisOrchestrator:
         print("=" * 70)
 
         # Extract key metrics from all analyses
-        budget_analysis_results = self.analysis_results_collection['budget']
-        salary_analysis_results = self.analysis_results_collection['salary']
-        roi_analysis_results = self.analysis_results_collection['roi']
-        cost_analysis_results = self.analysis_results_collection['cost']
-        company_overview_results = self.analysis_results_collection['company_overview']
+        budget_results = self.analysis_results_collection['budget']
+        salary_results = self.analysis_results_collection['salary']
+        roi_results = self.analysis_results_collection['roi']
+        cost_results = self.analysis_results_collection['cost']
+        planning_results = self.analysis_results_collection['company_overview']
 
         print(f"\nKEY PERFORMANCE INDICATORS:")
-        print(f"• Total Budget: {budget_analysis_results['total_budget']} RUB")
-        print(f"• Salary Distribution: {salary_analysis_results['salary_distribution']} RUB")
-        print(f"• Highest Budget Department: {budget_analysis_results['highest_budget_department']['name']} ({budget_analysis_results['highest_budget_department']['budget']} RUB)")
-        print(f"• Lowest Budget Department: {budget_analysis_results['lowest_budget_department']['name']} ({budget_analysis_results['lowest_budget_department']['budget']} RUB)")
-        print(f"• Salary Outliers Identified: {salary_analysis_results['salary_outliers']}")
-        print(f"• General ROI: {roi_analysis_results['general_roi']}%")
-        print(f"• Effective ROI Department: {roi_analysis_results['effective_roi_department']}")
-        print(f"• Ineffective ROI Department: {roi_analysis_results['ineffective_roi_department']}")
-        print(f"• ROI-Budget Correlation: {roi_analysis_results['roi_budget_correlation']}")
-        print(f"• Total monthly maintenance cost: {cost_analysis_results['general_costs']['total_monthly_cost']}")
-        print(f"• Total annual maintenance cost: {cost_analysis_results['general_costs']['total_annual_cost']}")
-        print(f"• Total monthly maintenance cost: {cost_analysis_results['general_costs']['total_monthly_cost']}")
-        print(f"• Total equipment cost: {cost_analysis_results['general_costs']['total_purchase_cost']}")
-        print(f"• Top spender department: {cost_analysis_results['high_operational_cost_departments']['top_spender_department']} spends {cost_analysis_results['high_operational_cost_departments']['top_spender_amount']} RUB")
-        print("RECOMMENDATIONS")
-        print(f"1. Audit {cost_analysis_results['high_operational_cost_departments']['top_spender_department']}")
-        print(f"2. Consider cost-saving measures for {cost_analysis_results['most_expensive_equipment']['name']} equipment, which has the highest monthly maintenance cost of {cost_analysis_results['most_expensive_equipment']['operational_info.maintenance_cost_per_month']} RUB/month")
-        print(f"\n• Break-even Point: {company_overview_results['break_even_point']['break_even_point']} RUB")
-        print(f"RECOMMENDATIONS")
-        print(f"• Increase financial investment in High Effective ROI Departments: {company_overview_results['high_effective_roi_department']}")
+        print(f"• Total Budget: {budget_results['total_budget']:,.0f} RUB")
+        print(f"• Highest Budget/Employee Dept: {budget_results['highest_budget_department']['name']}")
+        print(f"  Budget per Employee: {budget_results['highest_budget_department']['budget_per_employee']:,.0f} RUB")
+        print(f"• Lowest Budget/Employee Dept: {budget_results['lowest_budget_department']['name']}")
+        print(f"  Budget per Employee: {budget_results['lowest_budget_department']['budget_per_employee']:,.0f} RUB")
+        
+        # Salary metrics
+        if not salary_results['salary_outliers']:
+            print(f"• Salary Outliers Identified: 0 employees")
+        else:
+            print(f"• Salary Outliers Identified: {len(salary_results['salary_outliers'])} employees")
+        
+        # ROI metrics
+        print(f"• General ROI: {roi_results['general_roi']:.2f}%")
+        print(f"• Most Effective ROI Department: {roi_results['effective_roi_department']}")
+        print(f"• Least Effective ROI Department: {roi_results['ineffective_roi_department']}")
+        print(f"• ROI-Budget Correlation: {roi_results['roi_budget_correlation']:.3f}")
+        
+        # Cost metrics
+        print(f"• Total Equipment Purchase Cost: {cost_results['general_costs']['total_purchase_cost']:,.0f} RUB")
+        print(f"• Total Annual Maintenance Cost: {cost_results['general_costs']['total_annual_cost']:,.0f} RUB")
+        print(f"• Total Monthly Maintenance Cost: {cost_results['general_costs']['total_monthly_cost']:,.0f} RUB")
+        print(f"• Highest Operational Cost Dept: {cost_results['high_operational_cost_departments']['top_spender_department']}")
+        print(f"  Monthly Spending: {cost_results['high_operational_cost_departments']['top_spender_amount']:,.0f} RUB")
+        
+        # Planning metrics
+        print(f"• Break-Even Point: {planning_results['break_even_point']['break_even_point']:,.0f} RUB")
+
+        print(f"\nCRITICAL FINDINGS:")
+        print(f"1. Budget Allocation: Wide variance in per-employee budget allocation")
+        print(f"2. ROI Performance: Correlation of {roi_results['roi_budget_correlation']:.3f} between budget and ROI")
+        print(f"3. Cost Concerns: Annual maintenance represents {(cost_results['general_costs']['total_annual_cost'] / cost_results['general_costs']['total_purchase_cost'] * 100):.1f}% of equipment value")
+        
+        print(f"\nSTRATEGIC RECOMMENDATIONS:")
+        print(f"1. Increase investment in high-ROI department: {roi_results['effective_roi_department']}")
+        print(f"2. Audit equipment spending in: {cost_results['high_operational_cost_departments']['top_spender_department']}")
+        print(f"3. Review budget allocation for departments with low per-employee ratios")
+        print(f"4. Optimize maintenance contracts to reduce annual costs")
+        if salary_results['salary_outliers']:
+            print(f"5. Review salary structure for {len(salary_results['salary_outliers'])} identified outliers")
 
         print("\n" + "=" * 70)
 

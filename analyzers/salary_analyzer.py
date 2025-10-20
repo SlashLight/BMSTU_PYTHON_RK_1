@@ -34,14 +34,32 @@ class SalaryAnalyzer(BaseAnalyzer):
         self.logger.info(LogMessages.ANALYSIS_START.format("salary"))
 
         try:
+            # Print section header
+            print("=" * 70)
+            print("SALARY ANALYSIS")
+            print("=" * 70)
+            
             # Salary distribution analysis
             salary_distribution = self._analyze_salary_distribution()
+            print(f"\nSalary Distribution Statistics:")
+            for idx, row in salary_distribution.iterrows():
+                print(f"  {row['Metric']:15s} {row['Value']:>15,.0f} {"RUB" if row['Metric'] != 'count' else ""}")
 
             # Salary per department analysis
             salary_per_department = self._analyze_salary_per_department()
+            print(f"\nTotal Salary Fund: {sum(salary_per_department.values()):>12,.0f} RUB")
+            print(f"\nTotal Salary Fund by Department (Top 10):")
+            sorted_depts = sorted(salary_per_department.items(), key=lambda x: x[1], reverse=True)[:10]
+            for dept_name, total_salary in sorted_depts:
+                print(f"  {dept_name:40s} {total_salary:>12,.0f} RUB")
 
             # Identify salary outliers
             salary_outliers = self._identify_salary_outliers()
+            if isinstance(salary_outliers, list) and len(salary_outliers) == 0:
+                print(f"\nSalary Outliers: None identified")
+            else:
+                print(f"\nSalary Outliers Identified: {len(salary_outliers)} employees")
+                print(f"  (Employees with salaries significantly above or below normal range)")
 
             # Compile results
             analysis_results = {
@@ -50,12 +68,12 @@ class SalaryAnalyzer(BaseAnalyzer):
                 "salary_outliers": salary_outliers,
             }
 
-            self.logger.info(LogMessages.ANALYSIS_COMPLETE.format("budget"))
+            self.logger.info(LogMessages.ANALYSIS_COMPLETE.format("salary"))
 
             return analysis_results
 
         except Exception as analysis_error:
-            error_message = LogMessages.ANALYSIS_ERROR.format("budget", str(analysis_error))
+            error_message = LogMessages.ANALYSIS_ERROR.format("salary", str(analysis_error))
             self.logger.error(error_message)
             raise analysis_error
 

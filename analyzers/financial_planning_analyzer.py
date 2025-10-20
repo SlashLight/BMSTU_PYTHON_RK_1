@@ -32,25 +32,59 @@ class CompanyOverviewAnalyzer(BaseAnalyzer):
 
         @return: Dictionary containing company overview analysis results
         """
-        self.logger.info(LogMessages.ANALYSIS_START.format("Company Overview"))
+        self.logger.info(LogMessages.ANALYSIS_START.format("Financial Planning"))
 
         try:
+            # Print section header
+            print("=" * 70)
+            print("FINANCIAL PLANNING ANALYSIS")
+            print("=" * 70)
+            
             break_even_point = self._calculate_break_even_point()
+            
+            print(f"\nBreak-Even Point Calculation:")
+            total_salary = self.employees_df['work_info.salary'].sum()
+            total_maintenance = self.equipment_df['operational_info.maintenance_cost_per_month'].sum()
+            fixed_costs_annual = (total_salary + total_maintenance) * 12
+            
+            print(f"  Annual Fixed Costs:")
+            print(f"    Salaries:                   {total_salary * 12:>15,.0f} RUB")
+            print(f"    Equipment Maintenance:      {total_maintenance * 12:>15,.0f} RUB")
+            print(f"    Total Fixed Costs:          {fixed_costs_annual:>15,.0f} RUB")
+            print(f"  Assumed Margin Ratio:                        30.0%")
+            print(f"  Break-Even Point:             {break_even_point['break_even_point']:>15,.0f} RUB")
 
             high_effective_roi_department = self._find_high_effective_roi_department()
+            
+            print(f"\nHigh Effective ROI Departments (above average):")
+            avg_roi = self.roi_results['general_roi']
+            print(f"  Company Average ROI: {avg_roi:.2f}%")
+            print(f"\n  Departments exceeding average:")
+            dept_roi_sorted = high_effective_roi_department.sort_values(ascending=False)
+            count = 0
+            for dept_name, roi_value in dept_roi_sorted.items():
+                if roi_value > avg_roi and count < 10:
+                    print(f"    {dept_name:40s} {roi_value:>8.2f}%")
+                    count += 1
+            
+            print(f"\nRECOMMENDATIONS:")
+            print(f"• Increase investment in top 3 high-ROI departments")
+            print(f"• Develop support programs for underperforming departments")
+            print(f"• Set quarterly ROI targets for all departments")
+            print(f"• Monitor break-even point quarterly to track profitability")
 
             # Compile results
             analysis_results = {
                 "break_even_point": break_even_point,
-                "high_effective_roi_department": self._find_high_effective_roi_department()
+                "high_effective_roi_department": high_effective_roi_department
             }
 
-            self.logger.info(LogMessages.ANALYSIS_COMPLETE.format("ROI"))
+            self.logger.info(LogMessages.ANALYSIS_COMPLETE.format("Financial Planning"))
 
             return analysis_results
 
         except Exception as analysis_error:
-            error_message = LogMessages.ANALYSIS_ERROR.format("ROI", str(analysis_error))
+            error_message = LogMessages.ANALYSIS_ERROR.format("Financial Planning", str(analysis_error))
             self.logger.error(error_message)
             raise analysis_error
 

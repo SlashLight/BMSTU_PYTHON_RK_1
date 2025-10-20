@@ -24,17 +24,46 @@ class CostOptimizationAnalyzer(BaseAnalyzer):
 
     def execute_analysis(self):
         """
-        @brief Create pandas DataFrame for ROI analysis
-        Processes ROI data from loaded JSON
+        @brief Create pandas DataFrame for cost optimization analysis
+        Processes cost data from loaded JSON
 
-        @return: Dictionary containing ROI analysis results
+        @return: Dictionary containing cost optimization analysis results
         """
         self.logger.info(LogMessages.ANALYSIS_START.format("Cost Optimization"))
-        try:    
-
+        try:
+            # Print section header
+            print("=" * 70)
+            print("COST OPTIMIZATION ANALYSIS")
+            print("=" * 70)
+            
             general_costs_data = self._calculate_general_costs()
+            print(f"\nEquipment Cost Summary:")
+            print(f"  Total Purchase Cost:          {general_costs_data['total_purchase_cost']:>15,.0f} RUB")
+            print(f"  Total Monthly Maintenance:    {general_costs_data['total_monthly_cost']:>15,.0f} RUB")
+            print(f"  Total Annual Maintenance:     {general_costs_data['total_annual_cost']:>15,.0f} RUB")
+            
+            maintenance_ratio = (general_costs_data['total_annual_cost'] / general_costs_data['total_purchase_cost'] * 100)
+            print(f"  Maintenance/Purchase Ratio:   {maintenance_ratio:>14.1f}%")
+            
             high_cost_depts_data = self._find_high_operational_cost_departments()
+            print(f"\nDepartments with Highest Operational Costs (Top 10):")
+            top_10_depts = high_cost_depts_data['full_rating'].head(10)
+            for dept_name, monthly_cost in top_10_depts.items():
+                print(f"  {dept_name:40s} {monthly_cost:>12,.0f} RUB/month")
+            
             most_expensive_eq_data = self._find_most_expensive_equipment()
+            print(f"\nMost Expensive Equipment (by maintenance cost):")
+            print(f"  Name: {most_expensive_eq_data['name']}")
+            print(f"  Type: {most_expensive_eq_data['type']}")
+            print(f"  Department: {most_expensive_eq_data['department_name']}")
+            print(f"  Monthly Maintenance: {most_expensive_eq_data['operational_info.maintenance_cost_per_month']:,.0f} RUB")
+            print(f"  Annual Cost: {most_expensive_eq_data['operational_info.maintenance_cost_per_month'] * 12:,.0f} RUB")
+            
+            print(f"\nRECOMMENDATIONS FOR COST OPTIMIZATION:")
+            print(f"1. Audit equipment usage in {high_cost_depts_data['top_spender_department']} (highest costs)")
+            print(f"2. Review maintenance contracts - current ratio of {maintenance_ratio:.1f}% is high")
+            print(f"3. Consider consolidating or replacing high-maintenance equipment")
+            print(f"4. Implement preventive maintenance program to reduce costs")
 
             analysis_results = {
                 'general_costs': general_costs_data,
@@ -88,7 +117,7 @@ class CostOptimizationAnalyzer(BaseAnalyzer):
         return {
             'top_spender_department': top_spender_department,
             'top_spender_amount': top_spender_amount,
-            'full_rating': department_costs # Сохраняем полный рейтинг для отчета
+            'full_rating': department_costs
         }
 
     def _find_most_expensive_equipment(self):

@@ -34,17 +34,39 @@ class RoiAnalyzer(BaseAnalyzer):
         self.logger.info(LogMessages.ANALYSIS_START.format("ROI"))
 
         try:
+            # Print section header
+            print("=" * 70)
+            print("ROI ANALYSIS")
+            print("=" * 70)
+            
             self.completed_projects = self.projects_df[self.projects_df['status'] == 'completed']
             self.completed_projects['calculated_roi'] = (self.completed_projects['financials.profit'] / self.completed_projects['financials.actual_cost']) * 100
 
             # General ROI analysis
             general_roi = self._analyze_general_roi()
+            print(f"\nOverall Company ROI: {general_roi:.2f}%")
 
             # Effective ROI per department
             effective_roi_department, ineffective_roi_department, department_roi = self._analyze_effective_roi_per_department()
+            
+            print(f"\nDepartment ROI Performance (Top 10):")
+            top_10_roi = department_roi.head(10)
+            for dept_name, roi_value in top_10_roi.items():
+                print(f"  {dept_name:40s} {roi_value:>8.2f}%")
+            
+            print(f"\nROI Performance Summary:")
+            print(f"  Most Effective ROI Department: {effective_roi_department} ({department_roi[effective_roi_department]:.2f}%)")
+            print(f"  Least Effective ROI Department: {ineffective_roi_department} ({department_roi[ineffective_roi_department]:.2f}%)")
 
             # Correlation between budget and ROI
             correlation = self._analyze_roi_budget_correlation(department_roi)
+            print(f"\nROI-Budget Correlation: {correlation:.3f}")
+            if correlation > 0.3:
+                print(f"  (Positive correlation: Higher budgets tend to yield better ROI)")
+            elif correlation < -0.3:
+                print(f"  (Negative correlation: Higher budgets yield lower ROI - requires investigation)")
+            else:
+                print(f"  (Weak correlation: Budget size has limited impact on ROI)")
 
             # Compile results
             analysis_results = {

@@ -1,5 +1,5 @@
 """
-@brief Message templates for IT Infrastructure Analysis
+@brief Message templates for Financial Analysis System
 Contains all user-facing messages and logging templates
 """
 
@@ -10,28 +10,28 @@ class LogMessages:
     """
 
     # System initialization messages
-    SYSTEM_START = "IT Infrastructure Analysis System initialization started"
-    SYSTEM_READY = "IT Infrastructure Analysis System ready"
+    SYSTEM_START = "Financial Analysis System initialization started"
+    SYSTEM_READY = "Financial Analysis System ready"
     DATA_LOAD_START = "Starting data loading process from JSON file"
     DATA_LOAD_SUCCESS = "Data successfully loaded from file: {}"
     DATA_LOAD_ERROR = "Error loading data from file: {} - {}"
 
     # Analysis process messages
-    TOTAL_BUDGET_ANALYSIS_START = "Starting {} analysis"
+    TOTAL_BUDGET_ANALYSIS_START = "Starting total budget calculation"
     ANALYSIS_START = "Starting {} analysis"
     ANALYSIS_COMPLETE = "{} analysis completed successfully"
     ANALYSIS_ERROR = "Error during {} analysis: {}"
 
     # Data processing messages
     DATA_PROCESSING_START = "Starting data processing for {}"
-    DATA_FILTERING_START = "Filtering IT equipment from dataset"
+    DATA_FILTERING_START = "Filtering data from dataset"
     DATA_TRANSFORMATION_START = "Starting data transformation"
 
-    # Equipment analysis messages
-    EQUIPMENT_COUNT = "Total IT equipment identified: {} units"
-    EQUIPMENT_COST_CALCULATION = "Calculating total equipment costs"
-    UTILIZATION_CALCULATION = "Calculating equipment utilization metrics"
-    MAINTENANCE_COST_CALCULATION = "Calculating maintenance costs"
+    # Calculation messages
+    BUDGET_CALCULATION = "Calculating budget metrics"
+    SALARY_CALCULATION = "Calculating salary metrics"
+    ROI_CALCULATION = "Calculating ROI metrics"
+    COST_CALCULATION = "Calculating cost metrics"
 
 class ReportMessages:
     """
@@ -40,14 +40,23 @@ class ReportMessages:
     """
 
     # Section headers
-    INVENTORY_HEADER = "EQUIPMENT INVENTORY ANALYSIS"
-    UTILIZATION_HEADER = "EQUIPMENT UTILIZATION ANALYSIS"
-    COST_HEADER = "COST ANALYSIS"
-    REPLACEMENT_HEADER = "EQUIPMENT REPLACEMENT PLANNING"
-    OPTIMIZATION_HEADER = "INFRASTRUCTURE OPTIMIZATION"
+    BUDGET_HEADER = "BUDGET ANALYSIS"
+    SALARY_HEADER = "SALARY ANALYSIS"
+    ROI_HEADER = "ROI ANALYSIS"
+    COST_HEADER = "COST OPTIMIZATION ANALYSIS"
+    PLANNING_HEADER = "FINANCIAL PLANNING ANALYSIS"
+    SUMMARY_HEADER = "COMPREHENSIVE FINANCIAL ANALYSIS SUMMARY"
 
-    # Results messages
-    TOTAL_EQUIPMENT_COUNT = "Total IT equipment identified: {} units"
+    # Separator
+    SEPARATOR = "=" * 70
+    SHORT_SEPARATOR = "-" * 70
+
+    # Section messages
+    BUDGET_SECTION = "\nEXECUTING BUDGET ANALYSIS..."
+    SALARY_SECTION = "\nEXECUTING SALARY ANALYSIS..."
+    ROI_SECTION = "\nEXECUTING ROI ANALYSIS..."
+    COST_SECTION = "\nEXECUTING COST OPTIMIZATION ANALYSIS..."
+    PLANNING_SECTION = "\nEXECUTING FINANCIAL PLANNING ANALYSIS..."
     TOTAL_EQUIPMENT_COST = "Total IT assets value: {:,.0f} RUB"
     AVERAGE_UTILIZATION = "Average equipment utilization rate: {:.1f}%"
     ANNUAL_MAINTENANCE_COST = "Annual maintenance costs: {:,.0f} RUB"

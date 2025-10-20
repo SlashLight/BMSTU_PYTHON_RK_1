@@ -1,53 +1,32 @@
 """
-@brief Enumerations for IT Infrastructure Analysis
+@brief Enumerations for Financial Analysis System
 Contains all enum classes used across the analysis modules
 """
 
 from enum import Enum
 
-class EquipmentStatus(Enum):
+class AnalysisType(Enum):
     """
-    @brief Equipment operational status enumeration
-    Defines possible states of IT equipment
+    @brief Analysis type enumeration
+    Defines types of financial analyses available
     """
-    OPERATIONAL = "operational"
-    MAINTENANCE = "maintenance"
-    BROKEN = "broken"
-    RETIRED = "retired"
+    BUDGET = "budget"
+    SALARY = "salary"
+    ROI = "roi"
+    COST_OPTIMIZATION = "cost_optimization"
+    FINANCIAL_PLANNING = "financial_planning"
 
-class DepartmentType(Enum):
+class DepartmentCategory(Enum):
     """
-    @brief Department type classification enumeration
-    Categorizes company departments by their function
+    @brief Department category classification
+    Groups departments by their primary function
     """
     TECHNICAL = "technical"
-    PRODUCTION = "production"
     COMMERCIAL = "commercial"
     ADMINISTRATIVE = "administrative"
+    PRODUCTION = "production"
     RESEARCH = "research"
 
-class EquipmentType(Enum):
-    """
-    @brief IT equipment type classification
-    Defines categories of IT equipment for analysis
-    """
-    SERVER = "Сервер"
-    WORKSTATION = "Рабочая станция"
-    LAPTOP = "Ноутбук"
-    MONITOR = "Монитор"
-    NETWORK_EQUIPMENT = "Сетевое оборудование"
-    PRINTER = "Принтер"
-    SCANNER = "Сканер"
-    TELEPHONE = "Телефон"
-    PROJECTOR = "Проектор"
-
-class AnalysisPriority(Enum):
-    """
-    @brief Priority levels for equipment replacement
-    Defines urgency levels for equipment modernization
-    """
-    CRITICAL = "critical"
-    HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
 

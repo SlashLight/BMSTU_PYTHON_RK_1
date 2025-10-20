@@ -40,12 +40,15 @@ class AnalysisLogger:
         """
         @brief Configure root logger with basic settings
         Sets up logging format and level for all loggers
+        Note: Console output disabled - logs only to files
         """
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
+        # Disable console logging by setting root logger without handlers
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.INFO)
+        
+        # Remove all existing handlers from root logger
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
 
     def get_analysis_logger(self, analysis_name):
         """
@@ -57,13 +60,16 @@ class AnalysisLogger:
         """
         logger = logging.getLogger(analysis_name)
         logger.setLevel(logging.INFO)
+        
+        # Prevent propagation to root logger (no console output)
+        logger.propagate = False
 
         # Remove existing handlers to avoid duplicates
         for handler in logger.handlers[:]:
             logger.removeHandler(handler)
 
         # Create file handler for this analysis
-        log_filename = f"{analysis_name.lower()}_{datetime.now().strftime('%Y%m%d')}.log"
+        log_filename = f"{analysis_name.replace(' ', '_').lower()}_{datetime.now().strftime('%Y%m%d')}.log"
         log_filepath = os.path.join(self.log_directory, log_filename)
 
         try:
@@ -71,7 +77,8 @@ class AnalysisLogger:
             file_handler.setLevel(logging.INFO)
 
             formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S'
             )
             file_handler.setFormatter(formatter)
 
